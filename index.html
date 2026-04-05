@@ -211,24 +211,21 @@ function save(){
       items: result
     })
   })
-  .then(()=>{
-    if(alerts.length>0){
-      alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", "));
-    }else{
-      alert("บันทึกเรียบร้อย!");
-    }
-    loadLowStock();
+ .then(()=>{
+  if(alerts.length>0){
+    alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", "));
+  }else{
+    alert("บันทึกเรียบร้อย!");
+  }
 
-    button.innerText = "บันทึก";
-    button.disabled = false;
-    isSaving = false;
-  })
-  .catch(()=>{
-    alert("เกิดข้อผิดพลาด!");
-    button.innerText = "บันทึก";
-    button.disabled = false;
-    isSaving = false;
-  });
+  clearInputs(); // 👈 สำคัญมาก ต้องมีบรรทัดนี้
+
+  loadLowStock();
+
+  button.innerText = "บันทึก";
+  button.disabled = false;
+  isSaving = false;
+})
 }
 
 function loadLowStock(){
