@@ -78,6 +78,7 @@ function updateUIByMode(){
   else{
     button.innerText = "บันทึก (ใช้สินค้า)";
   }
+  clearInputs();
 }  
   
 // ข้อมูลสินค้า (พร้อมวงเล็บ)
@@ -245,6 +246,12 @@ function loadLowStock(){
       }
 
     });
+}
+function clearInputs(){
+  const inputs = document.querySelectorAll("#tbody input");
+  inputs.forEach(input=>{
+    input.value = "";
+  });
 }
 </script>
 
