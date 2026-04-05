@@ -23,6 +23,12 @@
 <div id="mainScreen" style="display:none">
 <h1 class="text-2xl font-bold text-orange-700 mb-4">🐍 Viper Food - เช็คสต็อก</h1>
 
+<select id="mode" class="border p-2 mb-2 w-full" onchange="updateUIByMode()">
+  <option value="check">📊 เช็คสต๊อก (เดิม)</option>
+  <option value="in">📥 รับสินค้าเข้า</option>
+  <option value="out">📤 ใช้/เบิกสินค้า</option>
+</select>  
+  
 <select id="category" class="border p-2 mb-4 w-full" onchange="renderItems()">
   <option value="นับทุกวัน">นับทุกวัน</option>
   <option value="นับวันจันทร์">นับวันจันทร์</option>
@@ -53,6 +59,21 @@ const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6F2kD
 
 let checkerName = "";
 
+function updateUIByMode(){
+  const mode = document.getElementById("mode").value;
+  const button = document.querySelector("button[onclick='save()']");
+
+  if(mode === "check"){
+    button.innerText = "บันทึก (เช็คสต๊อก)";
+  }
+  else if(mode === "in"){
+    button.innerText = "บันทึก (รับสินค้าเข้า)";
+  }
+  else{
+    button.innerText = "บันทึก (ใช้สินค้า)";
+  }
+}  
+  
 // ข้อมูลสินค้า (พร้อมวงเล็บ)
 const data = {
 "นับทุกวัน":["ใบกะเพรา (ไม่พอใส่ 0)","เนื้อทำข้าวหน้าเนื้อ (ชิ้น)","บะหมี่เหลือง (ห่อ)","หมูยอ (ก้อน)","โหระพา (ไม่พอใส่ 0)","ผักชีใบเลื่อย (ไม่พอใส่ 0)","ไข่ (แผง)","ขนมปังไข่กระทะ (ก้อน)","ต้นหอม (ไม่พอใส่ 0)","ผักสลัด (หัว)","น้ำถัง (ถัง)","ขนมปังแซนวิช (แผ่น)","ขนมปังซาวโดว์ (แผ่น)","แฮม (แผ่น)","ชีส (แผ่น)","เบค่อน (เส้น)","ไส้กรอก (ชิ้น)","มะเขือเทศ (ลูก)","อโวคาโด้ (ลูก)","กุ้ง (แพ็ค)","เส้นสปาเก็ตตี้ (แพ็ค)","วิปครีม (กล่อง)","พาเมซานชีส (ถุง)"],
@@ -105,32 +126,84 @@ function renderItems(){
   });
 }
 
+
+let isSaving = false;
+
 function save(){
+  if(isSaving) return;
+  isSaving = true;
+  const mode = document.getElementById("mode").value;
+
+  const button = document.querySelector("button[onclick='save()']");
+  button.innerText = "กำลังบันทึก...";
+  button.disabled = true;
+
   const rows=document.querySelectorAll("#tbody tr");
   let result=[], alerts=[], incomplete=false;
 
   rows.forEach(r=>{
-    const name=r.children[0].innerText.replace(/\s*\(.*?\)$/,""); // เอาชื่อจริงไม่รวมวงเล็บ
+    const name=r.children[0].innerText.replace(/\s*\(.*?\)$/,"");
     const value=r.children[1].children[0].value;
+
     if(value===""){ incomplete=true; }
+
     const qty=parseFloat(value)||0;
     const alertBox=r.children[2];
-    if(qty<=thresholds[name]){ if(thresholds[name]>0) alertBox.innerText="⚠️ ใกล้หมด!"; else alertBox.innerText=""; alerts.push(name); }
-    else{ alertBox.innerText=""; }
+
+    if(mode === "check" && qty<=thresholds[name]){
+      if(thresholds[name]>0){
+        alertBox.innerText="⚠️ ใกล้หมด!";
+        alerts.push(name);
+      }else{
+        alertBox.innerText="";
+      }
+    }else{
+      alertBox.innerText="";
+    }
+
     result.push({name,quantity:qty});
   });
 
   if(incomplete){
     alert("กรุณากรอกจำนวนครบทุกช่องก่อนบันทึก");
+    isSaving = false;
+    button.innerText = "บันทึก";
+    button.disabled = false;
+    return;
+  }
+
+  if(!confirm("ยืนยันการบันทึกข้อมูล?")){
+    isSaving = false;
+    button.innerText = "บันทึก";
+    button.disabled = false;
     return;
   }
 
   fetch(GOOGLE_SHEET_WEBAPP_URL,{
     method:"POST",
-    body:JSON.stringify({category:document.getElementById("category").value,checker_name:checkerName,items:result})
-  }).then(()=>{
-    if(alerts.length>0){ alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", ")); }
-    else{ alert("บันทึกเรียบร้อย!"); }
+    body:JSON.stringify({
+      category: document.getElementById("category").value,
+      checker_name: checkerName,
+      mode: mode,
+      items: result
+    })
+  })
+  .then(()=>{
+    if(alerts.length>0){
+      alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", "));
+    }else{
+      alert("บันทึกเรียบร้อย!");
+    }
+
+    button.innerText = "บันทึก";
+    button.disabled = false;
+    isSaving = false;
+  })
+  .catch(()=>{
+    alert("เกิดข้อผิดพลาด!");
+    button.innerText = "บันทึก";
+    button.disabled = false;
+    isSaving = false;
   });
 }
 </script>
