@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viper Food - ระบบเช็คสต็อก</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+<style>
+*{font-family:'Sarabun',sans-serif;}
+.alert{color:#b91c1c;font-weight:bold;}
+</style>
+</head>
+
+<body class="bg-orange-50 p-4">
+
+<div id="loginScreen">
+<h1 class="text-2xl font-bold text-orange-700 mb-4">🐍 Viper Food - เช็คสต็อก</h1>
+<input id="checkerNameInput" type="text" placeholder="กรอกชื่อผู้เช็ค" class="border p-2 w-full mb-4">
+<button onclick="enterSystem()" class="w-full bg-blue-500 text-white p-3 rounded">เข้าสู่ระบบ</button>
+</div>
+
+<div id="mainScreen" style="display:none">
+<h1 class="text-2xl font-bold text-orange-700 mb-4">🐍 Viper Food - เช็คสต็อก</h1>
+
+<select id="category" class="border p-2 mb-4 w-full" onchange="renderItems()">
+  <option value="นับทุกวัน">นับทุกวัน</option>
+  <option value="นับวันจันทร์">นับวันจันทร์</option>
+  <option value="นับวันอังคาร">นับวันอังคาร</option>
+  <option value="นับวันพุธ">นับวันพุธ</option>
+  <option value="นับวันพฤหัส">นับวันพฤหัส</option>
+  <option value="นับวันศุกร์">นับวันศุกร์</option>
+  <option value="นับวันเสาร์">นับวันเสาร์</option>
+  <option value="นับวันอาทิตย์">นับวันอาทิตย์</option>
+</select>
+
+<table class="w-full bg-white rounded shadow">
+<thead>
+<tr class="bg-orange-200">
+<th class="p-2">รายการ</th>
+<th class="p-2">จำนวน</th>
+<th class="p-2">แจ้งเตือน</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+
+<button onclick="save()" class="mt-4 w-full bg-green-500 text-white p-3 rounded">บันทึก</button>
+</div>
+
+<script>
+const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby6F2kDeEd7N-7Mb71UkhTHA3UFwHKFUHM_XrGIrPGZFq3m5j2JSV6J7bXZLv8D9tCYpQ/exec";
+
+let checkerName = "";
+
+// ข้อมูลสินค้า (พร้อมวงเล็บ)
+const data = {
+"นับทุกวัน":["ใบกะเพรา (ไม่พอใส่ 0)","เนื้อทำข้าวหน้าเนื้อ (ชิ้น)","บะหมี่เหลือง (ห่อ)","หมูยอ (ก้อน)","โหระพา (ไม่พอใส่ 0)","ผักชีใบเลื่อย (ไม่พอใส่ 0)","ไข่ (แผง)","ขนมปังไข่กระทะ (ก้อน)","ต้นหอม (ไม่พอใส่ 0)","ผักสลัด (หัว)","น้ำถัง (ถัง)","ขนมปังแซนวิช (แผ่น)","ขนมปังซาวโดว์ (แผ่น)","แฮม (แผ่น)","ชีส (แผ่น)","เบค่อน (เส้น)","ไส้กรอก (ชิ้น)","มะเขือเทศ (ลูก)","อโวคาโด้ (ลูก)","กุ้ง (แพ็ค)","เส้นสปาเก็ตตี้ (แพ็ค)","วิปครีม (กล่อง)","พาเมซานชีส (ถุง)"],
+"นับวันจันทร์":["น้ำมันเนื้อ (แพ็ค)","เนยจืด (ไม่พอใส่ 0)","เนยเค็ม (ไม่พอใส่ 0)","อกไก่แช่แข็ง (แพ็ค)","ไก่สับ (แพ็ค)","แตงกวา (ลูก)"],
+"นับวันอังคาร":["ถั่วงอก (ไม่พอใส่ 0)","พริก (แพ็ค)","กระเทียม (แพ็ค)","พริกแห้ง (แพ็ค)","หมูสับ (แพ็ค)","แครอท (หัว)"],
+"นับวันพุธ":["มันเจียว (แพ็ค)","เนื้อเจียว (แพ็ค)","กระเทียมแผ่น (ห่อ)","ตะเกียบ (แพ็ค)","หมูบดแช่แข็ง (แพ็ค)","น้ำมันพริก หอมเจียว (ไม่พอใส่ 0)","แตงกวา (ลูก)"],
+"นับวันพฤหัส":["เนื้อสับ (แพ็ค)","เนื้อตุ๋น (แพ็ค)","ข้าวสาร (ถัง)","เฟรนฟราย (ห่อ)","เอบิโรล (ถาด)","นักเก็ต (ถุง)","โดนัทกุ้ง (แพ็ค)","ซอสชีส (ไม่พอใส่ 0)","มายองเนส (ไม่พอใส่ 0)","ไข่กุ้ง (ไม่พอใส่ 0)","น้ำจิ้มบ๋วย (ไม่พอใส่ 0)","น้ำสลัดญี่ปุ่น (ไม่พอใส่ 0)"],
+"นับวันศุกร์":["หมูตุ๋น (แพ็ค)","ช้อน-ส้อม พลาสติก (แพ็ค)","กล่องข้าว (แพ็ค)","ถุงใส่กล่องข้าว (แพ็ค)","กระดาษรองกล่องข้าว (แพ็ค)","ถ้วยข้าวต้ม (ใบ)","ถ้วยไข่ลวก (ใบ)","กล่องใส่สปาเก็ตตี้ (10 ใบ)"],
+"นับวันเสาร์":["ซอสพริก (ถุง)","ซอสมะเขือเทศ (ถุง)","ซอยหอยนางรม (ขวด)","ซอสฝาเขียว (ขวด)","น้ำตาลทรายขาว (ห่อ)","รสดีหมู (ห่อ)","พริกไทยป่น (ห่อ)","ผงชูรส (ห่อ)","เกลือ (ห่อ)","น้ำมันพืช (ถัง)","ซอสมะเขือเทศซอง (ถุง)","ซอสพริกซอง (ถุง)","น้ำปลาพริกถุงเล็ก (แพ็ค)","แผ่นเกี๊ยว (ห่อ)","กุนเชียง (แท่ง)","กล่องใส่แซนวิช ซาวโดว์ (ใบ)","แม็กกี้ซอง (ซอง)","แม็กกี้ขวดเล็ก (ขวด)","ฟ้าไทย สีเขียว (ห่อ)"],
+"นับวันอาทิตย์":["ซอสกะเพรา (ไม่พอใส่ 0)","ผงข้าวผัด (ไม่พอใส่ 0)","ผงข้าวต้ม (ไม่พอใส่ 0)","มันเจียว (แพ็ค)","เนื้อเจียว (แพ็ค)","แครอท (หัว)","เส้นเล็ก (ก้อน)","มาม่า (ก้อน)","พริกเผา ฉั่วฮะเส็ง (ห่อ)","พริกเผา แม่ประนอม (กระปุก)","คนอร์ ต้มยำ (ก้อน)","เต้าหู้ (แท่ง)","มะนาว (ลูก)"]
+};
+
+// จำนวนขั้นต่ำแจ้งเตือน
+const thresholds = {
+"ใบกะเพรา":0,"เนื้อทำข้าวหน้าเนื้อ":10,"บะหมี่เหลือง":2,"หมูยอ":2,"โหระพา":0,"ผักชีใบเลื่อย":0,"ไข่":2,"ขนมปังไข่กระทะ":3,"ต้นหอม":0,"ผักสลัด":8,"น้ำถัง":5,"ขนมปังแซนวิช":20,"ขนมปังซาวโดว์":10,"แฮม":5,"ชีส":10,"เบค่อน":10,"ไส้กรอก":10,"มะเขือเทศ":3,"อโวคาโด้":3,"กุ้ง":2,"เส้นสปาเก็ตตี้":1,"วิปครีม":0,"พาเมซานชีส":0,
+"น้ำมันเนื้อ":2,"เนยจืด":0,"เนยเค็ม":0,"อกไก่แช่แข็ง":2,"ไก่สับ":30,"แตงกวา":3,
+"ถั่วงอก":0,"พริก":2,"กระเทียม":2,"พริกแห้ง":3,"หมูสับ":30,"แครอท":2,
+"มันเจียว":2,"เนื้อเจียว":2,"กระเทียมแผ่น":1,"ตะเกียบ":1,"หมูบดแช่แข็ง":2,"น้ำมันพริก หอมเจียว":0,"แตงกวา":3,
+"เนื้อสับ":30,"เนื้อตุ๋น":30,"ข้าวสาร":0.5,"เฟรนฟราย":1,"เอบิโรล":1,"นักเก็ต":1,"โดนัทกุ้ง":2,"ซอสชีส":0,"มายองเนส":0,"ไข่กุ้ง":0,"น้ำจิ้มบ๋วย":0,"น้ำสลัดญี่ปุ่น":0,
+"หมูตุ๋น":30,"ช้อน-ส้อม พลาสติก":0,"กล่องข้าว":1,"ถุงใส่กล่องข้าว":2,"กระดาษรองกล่องข้าว":1,"ถ้วยข้าวต้ม":10,"ถ้วยไข่ลวก":10,"กล่องใส่สปาเก็ตตี้":10,
+"ซอสพริก":1,"ซอสมะเขือเทศ":1,"ซอยหอยนางรม":1,"ซอสฝาเขียว":1,"น้ำตาลทรายขาว":1,"รสดีหมู":1,"พริกไทยป่น":0.5,"ผงชูรส":0.5,"เกลือ":0.5,"น้ำมันพืช":3,"ซอสมะเขือเทศซอง":1,"ซอสพริกซอง":1,"น้ำปลาพริกถุงเล็ก":1,"แผ่นเกี๊ยว":1,"กุนเชียง":2,"กล่องใส่แซนวิช ซาวโดว์":10,"แม็กกี้ซอง":10,"แม็กกี้ขวดเล็ก":0,"ฟ้าไทย สีเขียว":0.5,
+"ซอสกะเพรา":0,"ผงข้าวผัด":0,"ผงข้าวต้ม":0,"มันเจียว":1,"เนื้อเจียว":1,"แครอท":2,"เส้นเล็ก":10,"มาม่า":10,"พริกเผา ฉั่วฮะเส็ง":1,"พริกเผา แม่ประนอม":0.5,"คนอร์ ต้มยำ":5,"เต้าหู้":9,"มะนาว":5
+};
+
+function enterSystem(){
+  const name=document.getElementById("checkerNameInput").value.trim();
+  if(!name){ alert("กรุณากรอกชื่อผู้เช็ค"); return; }
+  checkerName=name;
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("mainScreen").style.display="block";
+  renderItems();
+}
+
+function renderItems(){
+  const cat=document.getElementById("category").value;
+  const tbody=document.getElementById("tbody");
+  tbody.innerHTML="";
+  if(!data[cat]||data[cat].length===0){
+    tbody.innerHTML=`<tr><td colspan="3" class="text-center p-2 text-gray-500">ไม่มีสินค้าในหมวดนี้</td></tr>`;
+    return;
+  }
+  data[cat].forEach(item=>{
+    tbody.innerHTML+=`
+      <tr>
+        <td class="p-2">${item}</td>
+        <td class="p-2"><input type="number" class="w-full border p-1" min="0" required></td>
+        <td class="p-2 alert" id="alert-${item.replace(/\s/g,'')}"></td>
+      </tr>
+    `;
+  });
+}
+
+function save(){
+  const rows=document.querySelectorAll("#tbody tr");
+  let result=[], alerts=[], incomplete=false;
+
+  rows.forEach(r=>{
+    const name=r.children[0].innerText.replace(/\s*\(.*?\)$/,""); // เอาชื่อจริงไม่รวมวงเล็บ
+    const value=r.children[1].children[0].value;
+    if(value===""){ incomplete=true; }
+    const qty=parseFloat(value)||0;
+    const alertBox=r.children[2];
+    if(qty<=thresholds[name]){ if(thresholds[name]>0) alertBox.innerText="⚠️ ใกล้หมด!"; else alertBox.innerText=""; alerts.push(name); }
+    else{ alertBox.innerText=""; }
+    result.push({name,quantity:qty});
+  });
+
+  if(incomplete){
+    alert("กรุณากรอกจำนวนครบทุกช่องก่อนบันทึก");
+    return;
+  }
+
+  fetch(GOOGLE_SHEET_WEBAPP_URL,{
+    method:"POST",
+    body:JSON.stringify({category:document.getElementById("category").value,checker_name:checkerName,items:result})
+  }).then(()=>{
+    if(alerts.length>0){ alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", ")); }
+    else{ alert("บันทึกเรียบร้อย!"); }
+  });
+}
+</script>
+
+</body>
+</html>
