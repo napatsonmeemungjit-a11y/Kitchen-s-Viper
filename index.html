@@ -35,7 +35,7 @@
   <option value="out">📤 ใช้/เบิกสินค้า</option>
 </select>  
   
-<select id="category" class="border p-2 mb-4 w-full" onchange="renderItems()">
+<select id="category" class="border p-2 mb-4 w-full" onchange="changeCategory()">
   <option value="นับทุกวัน">นับทุกวัน</option>
   <option value="นับวันจันทร์">นับวันจันทร์</option>
   <option value="นับวันอังคาร">นับวันอังคาร</option>
@@ -267,6 +267,36 @@ function clearInputs(){
   inputs.forEach(input=>{
     input.value = "";
   });
+}
+function changeCategory(){
+
+  // 1. ดึง input ทุกช่อง
+  const inputs = document.querySelectorAll("#tbody input");
+
+  // 2. เช็คว่ามีคนกรอกหรือยัง
+  let hasValue = false;
+
+  inputs.forEach(input=>{
+    if(input.value !== ""){
+      hasValue = true;
+    }
+  });
+
+  // 3. ถ้ามีข้อมูล → เตือนก่อน
+  if(hasValue){
+    const confirmChange = confirm("มีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนหมวดหรือไม่?");
+
+    // ❌ ถ้ากด Cancel → หยุดทันที
+    if(!confirmChange){
+      return;
+    }
+  }
+
+  // 4. ถ้ากด OK → โหลดรายการใหม่
+  renderItems();
+
+  // 5. ล้างช่อง (กันค่าค้าง)
+  clearInputs();
 }
 </script>
 
