@@ -66,6 +66,20 @@ let hasShownPopup = false;
 let checkerName = "";
 
 function updateUIByMode(){
+
+  const inputs = document.querySelectorAll("#tbody input");
+  let hasValue = false;
+
+  inputs.forEach(input=>{
+    if(input.value !== "") hasValue = true;
+  });
+
+  if(hasValue){
+    if(!confirm("มีข้อมูลที่ยังไม่ได้บันทึก ต้องการเปลี่ยนโหมดหรือไม่?")){
+      return;
+    }
+  }
+
   const mode = document.getElementById("mode").value;
   const button = document.querySelector("button[onclick='save()']");
 
@@ -78,8 +92,9 @@ function updateUIByMode(){
   else{
     button.innerText = "บันทึก (ใช้สินค้า)";
   }
+
   clearInputs();
-}  
+} 
   
 // ข้อมูลสินค้า (พร้อมวงเล็บ)
 const data = {
