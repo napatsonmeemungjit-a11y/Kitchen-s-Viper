@@ -146,6 +146,19 @@ function renderItems(){
   tbody.innerHTML = "";
 
   let items = [];
+  // 🔥 รวม + ลบซ้ำ
+  if(search !== ""){
+   Object.values(data).forEach(arr=>{
+    items = items.concat(arr);
+   });
+
+   // 👇 เพิ่มตรงนี้
+   items = [...new Set(items)];
+  }
+  else{
+   items = data[cat] || [];
+}
+     
 
   // 🔥 ถ้ามีการค้นหา → รวมทุกหมวด
   if(search !== ""){
