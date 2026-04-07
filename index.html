@@ -46,6 +46,13 @@
   <option value="นับวันอาทิตย์">นับวันอาทิตย์</option>
 </select>
 
+<input 
+  type="text" 
+  id="searchInput" 
+  placeholder="🔍 ค้นหาสินค้า..." 
+  class="border p-2 mb-2 w-full"
+  oninput="renderItems()"
+>
 <table class="w-full bg-white rounded shadow">
 <thead>
 <tr class="bg-orange-200">
@@ -131,18 +138,33 @@ function enterSystem(){
 }
 
 function renderItems(){
-  const cat=document.getElementById("category").value;
-  const tbody=document.getElementById("tbody");
-  tbody.innerHTML="";
-  if(!data[cat]||data[cat].length===0){
-    tbody.innerHTML=`<tr><td colspan="3" class="text-center p-2 text-gray-500">ไม่มีสินค้าในหมวดนี้</td></tr>`;
+
+  const cat = document.getElementById("category").value;
+  const search = document.getElementById("searchInput").value.toLowerCase();
+
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  if(!data[cat] || data[cat].length === 0){
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-2 text-gray-500">ไม่มีสินค้าในหมวดนี้</td></tr>`;
     return;
   }
-  data[cat].forEach(item=>{
-    tbody.innerHTML+=`
+
+  // 🔍 filter สินค้า
+  const filtered = data[cat].filter(item =>
+    item.toLowerCase().includes(search)
+  );
+
+  if(filtered.length === 0){
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-2 text-gray-500">ไม่พบสินค้า</td></tr>`;
+    return;
+  }
+
+  filtered.forEach(item=>{
+    tbody.innerHTML += `
       <tr>
         <td class="p-2">${item}</td>
-        <td class="p-2"><input type="number" class="w-full border p-1" min="0" required></td>
+        <td class="p-2"><input type="number" class="w-full border p-1" min="0"></td>
         <td class="p-2 alert" id="alert-${item.replace(/\s/g,'')}"></td>
       </tr>
     `;
