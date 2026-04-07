@@ -245,6 +245,53 @@ function changeCategory(){
   // 5. ล้างช่อง (กันค่าค้าง)
   clearInputs();
 }
+function save(){
+
+  const mode = document.getElementById("mode").value;
+  const category = document.getElementById("category").value;
+
+  const inputs = document.querySelectorAll("#tbody input");
+
+  let result = [];
+
+  inputs.forEach(input => {
+
+    const value = input.value;
+    const item = input.closest("tr").children[0].innerText;
+
+    if(value !== ""){
+      result.push({
+        name: item,
+        qty: Number(value)
+      });
+    }
+
+  });
+
+  if(result.length === 0){
+    alert("กรุณากรอกข้อมูลก่อนบันทึก");
+    return;
+  }
+
+  fetch(GOOGLE_SHEET_WEBAPP_URL,{
+    method:"POST",
+    body:JSON.stringify({
+      category: category,
+      checker_name: checkerName,
+      mode: mode,
+      items: result
+    })
+  })
+  .then(res => res.text())
+  .then(()=>{
+    alert("บันทึกสำเร็จ");
+    clearInputs();
+  })
+  .catch(()=>{
+    alert("บันทึกไม่สำเร็จ");
+  });
+
+}
 </script>
 
 </body>
