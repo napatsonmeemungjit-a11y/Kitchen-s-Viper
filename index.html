@@ -145,13 +145,21 @@ function renderItems(){
   const tbody = document.getElementById("tbody");
   tbody.innerHTML = "";
 
-  if(!data[cat] || data[cat].length === 0){
-    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-2 text-gray-500">ไม่มีสินค้าในหมวดนี้</td></tr>`;
-    return;
+  let items = [];
+
+  // 🔥 ถ้ามีการค้นหา → รวมทุกหมวด
+  if(search !== ""){
+    Object.values(data).forEach(arr=>{
+      items = items.concat(arr);
+    });
+  }
+  else{
+    // ปกติ → ใช้หมวดเดิม
+    items = data[cat] || [];
   }
 
-  // 🔍 filter สินค้า
-  const filtered = data[cat].filter(item =>
+  // 🔍 filter
+  const filtered = items.filter(item =>
     item.toLowerCase().includes(search)
   );
 
@@ -169,85 +177,6 @@ function renderItems(){
       </tr>
     `;
   });
-}
-
-
-let isSaving = false;
-
-function save(){
-  if(isSaving) return;
-  isSaving = true;
-  const mode = document.getElementById("mode").value;
-
-  const button = document.querySelector("button[onclick='save()']");
-  button.innerText = "กำลังบันทึก...";
-  button.disabled = true;
-
-  const rows=document.querySelectorAll("#tbody tr");
-  let result=[], alerts=[], incomplete=false;
-
-  rows.forEach(r=>{
-    const name=r.children[0].innerText.replace(/\s*\(.*?\)$/,"");
-    const value=r.children[1].children[0].value;
-
-    if(value===""){ incomplete=true; }
-
-    const qty=parseFloat(value)||0;
-    const alertBox=r.children[2];
-
-    if(mode === "check" && qty<=thresholds[name]){
-      if(thresholds[name]>0){
-        alertBox.innerText="⚠️ ใกล้หมด!";
-        alerts.push(name);
-      }else{
-        alertBox.innerText="";
-      }
-    }else{
-      alertBox.innerText="";
-    }
-
-    result.push({name,quantity:qty});
-  });
-
-  if(incomplete){
-    alert("กรุณากรอกจำนวนครบทุกช่องก่อนบันทึก");
-    isSaving = false;
-    button.innerText = "บันทึก";
-    button.disabled = false;
-    return;
-  }
-
-  if(!confirm("ยืนยันการบันทึกข้อมูล?")){
-    isSaving = false;
-    button.innerText = "บันทึก";
-    button.disabled = false;
-    return;
-  }
-
-  fetch(GOOGLE_SHEET_WEBAPP_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      category: document.getElementById("category").value,
-      checker_name: checkerName,
-      mode: mode,
-      items: result
-    })
-  })
- .then(()=>{
-  if(alerts.length>0){
-    alert("บันทึกเรียบร้อย!\n⚠️ สินค้าใกล้หมด: "+alerts.join(", "));
-  }else{
-    alert("บันทึกเรียบร้อย!");
-  }
-
-  clearInputs(); // 👈 สำคัญมาก ต้องมีบรรทัดนี้
-
-  loadLowStock();
-
-  button.innerText = "บันทึก";
-  button.disabled = false;
-  isSaving = false;
-})
 }
 
 function loadLowStock(){
