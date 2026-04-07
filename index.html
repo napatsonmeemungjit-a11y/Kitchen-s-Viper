@@ -158,18 +158,7 @@ function renderItems(){
   else{
    items = data[cat] || [];
 }
-     
-
-  // 🔥 ถ้ามีการค้นหา → รวมทุกหมวด
-  if(search !== ""){
-    Object.values(data).forEach(arr=>{
-      items = items.concat(arr);
-    });
-  }
-  else{
-    // ปกติ → ใช้หมวดเดิม
-    items = data[cat] || [];
-  }
+    
 
   // 🔍 filter
   const filtered = items.filter(item =>
