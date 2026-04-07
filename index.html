@@ -247,6 +247,8 @@ function changeCategory(){
 }
 function save(){
 
+  console.log("🔥 กดบันทึกแล้ว");
+
   const mode = document.getElementById("mode").value;
   const category = document.getElementById("category").value;
 
@@ -268,6 +270,8 @@ function save(){
 
   });
 
+  console.log("ข้อมูลที่จะส่ง:", result);
+
   if(result.length === 0){
     alert("กรุณากรอกข้อมูลก่อนบันทึก");
     return;
@@ -283,11 +287,13 @@ function save(){
     })
   })
   .then(res => res.text())
-  .then(()=>{
+  .then(res=>{
+    console.log("ผลลัพธ์จาก server:", res);
     alert("บันทึกสำเร็จ");
     clearInputs();
   })
-  .catch(()=>{
+  .catch(err=>{
+    console.error(err);
     alert("บันทึกไม่สำเร็จ");
   });
 
