@@ -146,21 +146,17 @@ function renderItems(){
   tbody.innerHTML = "";
 
   let items = [];
-  // 🔥 รวม + ลบซ้ำ
-  if(search !== ""){
-   Object.values(data).forEach(arr=>{
-    items = items.concat(arr);
-   });
 
-   // 👇 เพิ่มตรงนี้
-   items = [...new Set(items)];
+  if(search !== ""){
+    Object.values(data).forEach(arr=>{
+      items = items.concat(arr);
+    });
+    items = [...new Set(items)];
   }
   else{
-   items = data[cat] || [];
-}
-    
+    items = data[cat] || [];
+  }
 
-  // 🔍 filter
   const filtered = items.filter(item =>
     item.toLowerCase().includes(search)
   );
@@ -170,18 +166,18 @@ function renderItems(){
     return;
   }
 
- filtered.forEach((item,index)=>{
-  tbody.innerHTML += `
-    <tr>
-      <td class="p-2">${item}</td>
-      <td class="p-2">
-        <input type="number" class="w-full border p-1" min="0">
-      </td>
-      <td class="p-2 alert" id="alert-${item.replace(/\s/g,'')}-${index}"></td>
-    </tr>
-  `;
-});
-
+  filtered.forEach((item,index)=>{
+    tbody.innerHTML += `
+      <tr>
+        <td class="p-2">${item}</td>
+        <td class="p-2">
+          <input type="number" class="w-full border p-1" min="0">
+        </td>
+        <td class="p-2 alert" id="alert-${item.replace(/\\s/g,'')}-${index}"></td>
+      </tr>
+    `;
+  });
+}
 function loadLowStock(){
 
   fetch(GOOGLE_SHEET_WEBAPP_URL)
