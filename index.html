@@ -307,6 +307,7 @@ function save(){
     btn.innerText = "บันทึก";
 
     clearInputs();
+    hasShownPopup = false; // 🔥 เพิ่มบรรทัดนี้
     loadLowStock(); // ✅ อัปเดตแจ้งเตือนทันที
 
     setTimeout(()=>{
