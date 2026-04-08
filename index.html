@@ -137,6 +137,7 @@ function enterSystem(){
   document.getElementById("mainScreen").style.display="block";
   renderItems();
   loadLowStock();
+  setInterval(loadLowStock, 30000);
 }
 
 function renderItems(){
@@ -306,6 +307,7 @@ function save(){
     btn.innerText = "บันทึก";
 
     clearInputs();
+    loadLowStock(); // ✅ อัปเดตแจ้งเตือนทันที
 
     setTimeout(()=>{
       status.innerText = "";
