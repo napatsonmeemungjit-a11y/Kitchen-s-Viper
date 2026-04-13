@@ -249,6 +249,11 @@ function changeCategory(){
   clearInputs();
 }
 function save(){
+  if(isSaving){
+  alert("กำลังบันทึกอยู่...");
+  return;
+  }
+  isSaving = true;
 
   console.log("🔥 กดบันทึกแล้ว");
 
@@ -299,6 +304,7 @@ function save(){
   })
   .then(res => res.text())
   .then(res=>{
+    isSaving = false;
     console.log("ผลลัพธ์จาก server:", res);
 
     // ✅ สำเร็จ
@@ -316,7 +322,7 @@ function save(){
 
   })
   .catch(err=>{
-    console.error(err);
+    isSaving = false;
 
     // ❌ error
     status.innerText = "❌ บันทึกไม่สำเร็จ";
