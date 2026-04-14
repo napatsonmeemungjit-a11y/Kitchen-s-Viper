@@ -276,6 +276,27 @@ function save(){
     alert("กรุณากรอกข้อมูลก่อนบันทึก");
     return;
   }
+  // ======================
+// 🔍 สรุปก่อนบันทึก
+// ======================
+
+let summary = "คุณกำลังจะบันทึก:\n\n";
+
+if(mode === "in") summary += "📥 รับสินค้าเข้า\n";
+else if(mode === "out") summary += "📤 ใช้สินค้า\n";
+else summary += "📊 เช็คสต๊อก\n";
+
+result.forEach(item=>{
+  summary += `- ${item.name} = ${item.qty}\n`;
+});
+
+// 🔥 popup ยืนยัน
+const confirmSave = confirm(summary + "\nยืนยันหรือไม่?");
+
+if(!confirmSave){
+  isSaving = false; // 🔥 สำคัญมาก
+  return;
+}
 
   // 🔄 เริ่มบันทึก
   btn.disabled = true;
