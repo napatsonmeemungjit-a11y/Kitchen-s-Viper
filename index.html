@@ -393,6 +393,13 @@ function loadTodayData(){
       if(item.mode === "out") totalOut += item.qty;
       });
 
+      html += `
+  <div style="background:#f3f4f6;padding:10px;margin-bottom:10px;border-radius:8px;">
+    📥 รับเข้า: ${totalIn} <br>
+    📤 ใช้ออก: ${totalOut}
+  </div>
+`;
+
  data.forEach(item=>{
 
   let color = "#333";
