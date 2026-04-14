@@ -384,44 +384,82 @@ function loadTodayData(){
         return;
       }
 
-      let html = "";
+      // =========================
+      // 🔥 รวมข้อมูลตามสินค้า
+      // =========================
+      let summary = {};
+
+      data.forEach(item=>{
+        if(!summary[item.name]){
+          summary[item.name] = {in:0, out:0};
+        }
+
+        if(item.mode === "in"){
+          summary[item.name].in += item.qty;
+        }
+        else if(item.mode === "out"){
+          summary[item.name].out += item.qty;
+        }
+      });
+
+      // =========================
+      // 🔥 สร้างตาราง
+      // =========================
+      let html = `
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#fde68a;">
+            <th style="padding:8px; border:1px solid #ddd;">สินค้า</th>
+            <th style="padding:8px; border:1px solid #ddd;">📥 รับเข้า</th>
+            <th style="padding:8px; border:1px solid #ddd;">📤 ใช้ออก</th>
+            <th style="padding:8px; border:1px solid #ddd;">📦 คงเหลือ</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+
       let totalIn = 0;
       let totalOut = 0;
 
-      data.forEach(item=>{
-      if(item.mode === "in") totalIn += item.qty;
-      if(item.mode === "out") totalOut += item.qty;
-      });
+      for(let name in summary){
+
+        let inQty = summary[name].in;
+        let outQty = summary[name].out;
+        let remain = inQty - outQty;
+
+        totalIn += inQty;
+        totalOut += outQty;
+
+        html += `
+          <tr>
+            <td style="padding:8px; border:1px solid #ddd;">${name}</td>
+            <td style="padding:8px; border:1px solid #ddd; color:green;">${inQty}</td>
+            <td style="padding:8px; border:1px solid #ddd; color:red;">${outQty}</td>
+            <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">${remain}</td>
+          </tr>
+        `;
+      }
+
+      let totalRemain = totalIn - totalOut;
+
+      // 🔥 แถวรวม
+      html += `
+        <tr style="background:#e5e7eb; font-weight:bold;">
+          <td style="padding:8px; border:1px solid #ddd;">รวม</td>
+          <td style="padding:8px; border:1px solid #ddd; color:green;">${totalIn}</td>
+          <td style="padding:8px; border:1px solid #ddd; color:red;">${totalOut}</td>
+          <td style="padding:8px; border:1px solid #ddd;">${totalRemain}</td>
+        </tr>
+      `;
 
       html += `
-  <div style="background:#f3f4f6;padding:10px;margin-bottom:10px;border-radius:8px;">
-    📥 รับเข้า: ${totalIn} <br>
-    📤 ใช้ออก: ${totalOut}
-  </div>
-`;
+        </tbody>
+      </table>
+      `;
 
- data.forEach(item=>{
-
-  let color = "#333";
-  if(item.mode === "in") color = "green";
-  if(item.mode === "out") color = "red";
-
-  html += `
-    <div style="
-      border-bottom:1px solid #eee;
-      padding:8px;
-      margin-bottom:5px;
-    ">
-      <div><b>👤 ${item.checker}</b></div>
-      <div>⏰ ${item.time}</div>
-      <div style="color:${color}">
-        ${item.mode === "in" ? "📥 รับเข้า" : "📤 ใช้ออก"}
-      </div>
-      <div>📦 ${item.name} = ${item.qty}</div>
-    </div>
-  `;
-});
-
+      // =========================
+      // ✅ แสดงผล
+      // =========================
       box.innerHTML = html;
 
     });
