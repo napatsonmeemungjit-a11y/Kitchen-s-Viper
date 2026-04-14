@@ -391,7 +391,7 @@ function loadTodayData(){
 
       data.forEach(item=>{
         if(!summary[item.name]){
-          summary[item.name] = {in:0, out:0};
+          summary[item.name] = {in:0, out:0, min: item.min || 0};
         }
 
         if(item.mode === "in"){
@@ -430,8 +430,15 @@ function loadTodayData(){
         totalIn += inQty;
         totalOut += outQty;
 
+        let min = summary[name].min || 0;
+        let rowStyle = "";
+
+     // 🔥 เช็คของใกล้หมด
+     if(remain <= min){
+     rowStyle = "background:#fecaca;"; // แดงอ่อน
+     }
         html += `
-          <tr>
+          <tr style="${rowStyle}">
             <td style="padding:8px; border:1px solid #ddd;">${name}</td>
             <td style="padding:8px; border:1px solid #ddd; color:green;">${inQty}</td>
             <td style="padding:8px; border:1px solid #ddd; color:red;">${outQty}</td>
