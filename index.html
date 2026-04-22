@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="th">
 <head>
@@ -452,33 +453,36 @@ style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
     return;
   }
 
-fetch(GOOGLE_SHEET_WEBAPP_URL,{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  body:JSON.stringify({
-    category: category,
-    checker_name: checkerName,
-    mode: mode,
-    items: result
+  fetch(GOOGLE_SHEET_WEBAPP_URL,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify({
+      checker_name: checkerName,
+      mode: "check",
+      category: "แก้ย้อนหลัง",
+      fix_id: id,
+      items: [
+        {
+          name: name,
+          qty: qty
+        }
+      ]
+    })
   })
-})
   .then(res=>res.text())
   .then(res=>{
-    alert("แก้ไขสำเร็จ");
+    console.log(res)
+    alert("แก้ไขสำเร็จ")
 
-    loadTodayData();
-    loadLowStock();
+    loadTodayData()
+    loadLowStock()
   })
   .catch(err=>{
-  console.log("save error:", err)
-
-  isSaving = false;
-  status.innerText = "❌ บันทึกไม่สำเร็จ";
-  btn.disabled = false;
-  btn.innerText = "บันทึก";
-});
+    console.log(err)
+    alert("แก้ไขไม่สำเร็จ")
+  })
 }
   function editItem(name, qty){
 
