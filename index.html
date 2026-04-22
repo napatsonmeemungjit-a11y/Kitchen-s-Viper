@@ -290,9 +290,10 @@ function save(){
   console.log("ข้อมูลที่จะส่ง:", result);
 
   if(result.length === 0){
-    alert("กรุณากรอกข้อมูลก่อนบันทึก");
-    return;
-  }
+  alert("กรุณากรอกข้อมูลก่อนบันทึก");
+  isSaving = false;
+  return;
+}
   // ======================
 // 🔍 สรุปก่อนบันทึก
 // ======================
@@ -421,10 +422,10 @@ function loadTodayData(){
       <td>${item.qty}</td>
       <td>${item.checker_name}</td>
       <td>
-        <button onclick="editItem('${item.name}', ${item.qty}, 0)"
-          style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
-          แก้ไข
-        </button>
+        <button onclick="editTransaction('${item.id}','${item.name}',${item.qty})"
+style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
+แก้ไข
+</button>
       </td>
     </tr>
   `;
@@ -451,21 +452,18 @@ function loadTodayData(){
     return;
   }
 
-  fetch(GOOGLE_SHEET_WEBAPP_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      checker_name: checkerName,
-      mode: "check",
-      category: "แก้ย้อนหลัง",
-      fix_id: id,
-      items: [
-        {
-          name: name,
-          qty: qty
-        }
-      ]
-    })
+fetch(GOOGLE_SHEET_WEBAPP_URL,{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    category: category,
+    checker_name: checkerName,
+    mode: mode,
+    items: result
   })
+})
   .then(res=>res.text())
   .then(res=>{
     alert("แก้ไขสำเร็จ");
@@ -474,8 +472,13 @@ function loadTodayData(){
     loadLowStock();
   })
   .catch(err=>{
-    alert("แก้ไขไม่สำเร็จ");
-  });
+  console.log("save error:", err)
+
+  isSaving = false;
+  status.innerText = "❌ บันทึกไม่สำเร็จ";
+  btn.disabled = false;
+  btn.innerText = "บันทึก";
+});
 }
   function editItem(name, qty){
 
