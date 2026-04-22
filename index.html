@@ -398,59 +398,37 @@ function loadTodayData(){
         </thead>
         <tbody>
       `;
-      html += `
-<tr style="${rowStyle}">
-  <td style="padding:8px; border:1px solid #ddd;">${name}</td>
-  <td style="padding:8px; border:1px solid #ddd; color:green;">${inQty}</td>
-  <td style="padding:8px; border:1px solid #ddd; color:red;">${outQty}</td>
-  <td style="padding:8px; border:1px solid #ddd;">${remain}</td>
 
-  <td style="padding:8px;">
-    <button onclick="editItem('${name}', '${summary[name].in}', '${summary[name].out}', '${mode}')"
-      style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
-      แก้ไข
-    </button>
-  </td>
-</tr>
-`;
+      data.forEach(item => {
 
-      data.forEach(item=>{
+  let modeText = "";
 
-        let modeText = "";
+  if(item.mode === "in"){
+    modeText = "📥 รับเข้า";
+  }
+  else if(item.mode === "out"){
+    modeText = "📤 ใช้ออก";
+  }
+  else{
+    modeText = "📊 เช็ค";
+  }
 
-        if(item.mode === "in"){
-          modeText = "📥 รับเข้า";
-        }
-        else if(item.mode === "out"){
-          modeText = "📤 ใช้ออก";
-        }
-        else{
-          modeText = "📊 เช็ค";
-        }
-
-        html += `
-          <tr>
-            <td>${item.time}</td>
-            <td>${item.name}</td>
-            <td>${modeText}</td>
-            <td>${item.qty}</td>
-            <td>${item.checker}</td>
-            <td>
-              <button 
-                onclick="editTransaction('${item.id}','${item.name}',${item.qty})"
-                style="
-                  background:#3b82f6;
-                  color:white;
-                  padding:5px 10px;
-                  border:none;
-                  border-radius:6px;
-                ">
-                แก้ไข
-              </button>
-            </td>
-          </tr>
-        `;
-      });
+  html += `
+    <tr>
+      <td>${item.time}</td>
+      <td>${item.name}</td>
+      <td>${modeText}</td>
+      <td>${item.qty}</td>
+      <td>${item.checker_name}</td>
+      <td>
+        <button onclick="editItem('${item.name}', ${item.qty}, 0)"
+          style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
+          แก้ไข
+        </button>
+      </td>
+    </tr>
+  `;
+});
 
       html += `</tbody></table>`;
 
@@ -499,13 +477,11 @@ function loadTodayData(){
     alert("แก้ไขไม่สำเร็จ");
   });
 }
-  function editItem(name, inQty, outQty, mode){
+  function editItem(name, qty){
 
-  // เปลี่ยนเป็นโหมด check ก่อน
   document.getElementById("mode").value = "check";
   updateUIByMode();
 
-  // ใส่ชื่อค้นหา
   document.getElementById("searchInput").value = name;
   renderItems();
 
@@ -516,7 +492,7 @@ function loadTodayData(){
       const itemName = input.closest("tr").children[0].innerText;
 
       if(itemName === name){
-        input.value = Number(inQty) - Number(outQty);
+        input.value = qty;
       }
     });
   },300);
