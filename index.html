@@ -8,6 +8,24 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
 <style>
+<style>
+*{font-family:'Sarabun',sans-serif;}
+.alert{color:#b91c1c;font-weight:bold;}
+
+/* 🔥 ปุ่ม active */
+.tab-active{
+  background:#111827 !important;
+  color:white !important;
+}
+
+/* 🔥 ปุ่มปกติ hover */
+.tab-btn{
+  transition:0.2s;
+}
+.tab-btn:hover{
+  filter:brightness(1.1);
+}
+</style>
 *{font-family:'Sarabun',sans-serif;}
 .alert{color:#b91c1c;font-weight:bold;}
 </style>
@@ -78,15 +96,21 @@ class="mt-2 w-full bg-blue-500 text-white p-3 rounded">
 <div id="todayScreen" style="display:none">
   <div style="margin-bottom:10px; display:flex; gap:5px;">
 
-<button onclick="loadTodayData('today')" style="flex:1;background:#f59e0b;color:white;padding:6px;border-radius:5px;">
+<button onclick="loadTodayData('today')"
+class="tab-btn" id="btn-today"
+style="flex:1;background:#f59e0b;color:white;padding:6px;border-radius:5px;">
 วันนี้
 </button>
 
-<button onclick="loadTodayData('yesterday')" style="flex:1;background:#3b82f6;color:white;padding:6px;border-radius:5px;">
+<button onclick="loadTodayData('yesterday')"
+class="tab-btn" id="btn-yesterday"
+style="flex:1;background:#3b82f6;color:white;padding:6px;border-radius:5px;">
 เมื่อวาน
 </button>
 
-<button onclick="loadTodayData('all')" style="flex:1;background:#10b981;color:white;padding:6px;border-radius:5px;">
+<button onclick="loadTodayData('all')"
+class="tab-btn" id="btn-all"
+style="flex:1;background:#10b981;color:white;padding:6px;border-radius:5px;">
 ทั้งหมด
 </button>
 
@@ -397,7 +421,10 @@ function loadTodayData(type = "today"){
   const box = document.getElementById("todayList");
   const loading = document.getElementById("loadingBox");
 
-  // 🔥 แสดงโหลด
+  // 🔥 highlight ปุ่ม
+  setActiveTab(type);
+
+  // 🔥 loading
   loading.style.display = "block";
   box.innerHTML = "";
 
@@ -432,13 +459,9 @@ function loadTodayData(type = "today"){
 
         let modeText = "";
 
-        if(item.mode === "in"){
-          modeText = "📥 รับเข้า";
-        } else if(item.mode === "out"){
-          modeText = "📤 ใช้ออก";
-        } else {
-          modeText = "📊 เช็ค";
-        }
+        if(item.mode === "in") modeText = "📥 รับเข้า";
+        else if(item.mode === "out") modeText = "📤 ใช้ออก";
+        else modeText = "📊 เช็ค";
 
         html += `
           <tr>
@@ -459,17 +482,14 @@ function loadTodayData(type = "today"){
       });
 
       html += `</tbody></table>`;
-
       box.innerHTML = html;
     })
 
     .catch(err => {
       loading.style.display = "none";
       box.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
-      console.log(err);
     });
 }
-
 function editTransaction(id,name,oldQty,oldMode){
 
   const newMode = prompt(
@@ -575,6 +595,16 @@ function deleteTransaction(id){
     alert("ลบไม่สำเร็จ");
   });
 
+}
+function setActiveTab(type){
+
+  document.getElementById("btn-today").classList.remove("tab-active");
+  document.getElementById("btn-yesterday").classList.remove("tab-active");
+  document.getElementById("btn-all").classList.remove("tab-active");
+
+  if(type === "today") document.getElementById("btn-today").classList.add("tab-active");
+  if(type === "yesterday") document.getElementById("btn-yesterday").classList.add("tab-active");
+  if(type === "all") document.getElementById("btn-all").classList.add("tab-active");
 }
 </script>
 
