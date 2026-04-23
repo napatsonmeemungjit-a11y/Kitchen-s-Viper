@@ -76,6 +76,21 @@ class="mt-2 w-full bg-blue-500 text-white p-3 rounded">
 
 </div>
 <div id="todayScreen" style="display:none">
+  <div style="margin-bottom:10px; display:flex; gap:5px;">
+
+<button onclick="loadTodayData('today')" style="flex:1;background:#f59e0b;color:white;padding:6px;border-radius:5px;">
+วันนี้
+</button>
+
+<button onclick="loadTodayData('yesterday')" style="flex:1;background:#3b82f6;color:white;padding:6px;border-radius:5px;">
+เมื่อวาน
+</button>
+
+<button onclick="loadTodayData('all')" style="flex:1;background:#10b981;color:white;padding:6px;border-radius:5px;">
+ทั้งหมด
+</button>
+
+</div>
 
   <h1 class="text-xl font-bold mb-2">📊 รายการวันนี้</h1>
 
@@ -373,16 +388,16 @@ function backToMain(){
   document.getElementById("mainScreen").style.display = "block";
 }
 
-function loadTodayData(){
+function loadTodayData(type = "today"){
 
-  fetch(GOOGLE_SHEET_WEBAPP_URL + "?type=today")
+  fetch(GOOGLE_SHEET_WEBAPP_URL + "?type=" + type)
     .then(res => res.json())
     .then(data => {
 
       const box = document.getElementById("todayList");
 
       if(!data || data.length === 0){
-        box.innerHTML = "ไม่มีข้อมูลวันนี้";
+        box.innerHTML = "ไม่มีข้อมูล";
         return;
       }
 
@@ -396,7 +411,7 @@ function loadTodayData(){
             <th>ประเภท</th>
             <th>จำนวน</th>
             <th>ผู้เช็ค</th>
-            <th>แก้ไข</th>
+            <th>ลบ</th>
           </tr>
         </thead>
         <tbody>
@@ -404,35 +419,33 @@ function loadTodayData(){
 
       data.forEach(item => {
 
-  let modeText = "";
+        let modeText = "";
 
-  if(item.mode === "in"){
-    modeText = "📥 รับเข้า";
-  }
-  else if(item.mode === "out"){
-    modeText = "📤 ใช้ออก";
-  }
-  else{
-    modeText = "📊 เช็ค";
-  }
+        if(item.mode === "in"){
+          modeText = "📥 รับเข้า";
+        } else if(item.mode === "out"){
+          modeText = "📤 ใช้ออก";
+        } else {
+          modeText = "📊 เช็ค";
+        }
 
-  html += `
-    <tr>
-      <td>${item.date ? item.date : "-"}</td>
-      <td>${item.time ? item.time : "-"}</td>
-      <td>${item.name}</td>
-      <td>${modeText}</td>
-      <td>${item.qty}</td>
-      <td>${item.checker_name}</td>
-      <td>
-<button onclick="deleteTransaction('${item.id}')"
-style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
-ลบ
-</button>
-</td>
-    </tr>
-  `;
-});
+        html += `
+          <tr>
+            <td>${item.date}</td>
+            <td>${item.time}</td>
+            <td>${item.name}</td>
+            <td>${modeText}</td>
+            <td>${item.qty}</td>
+            <td>${item.checker_name}</td>
+            <td>
+              <button onclick="deleteTransaction('${item.id}')"
+              style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
+              ลบ
+              </button>
+            </td>
+          </tr>
+        `;
+      });
 
       html += `</tbody></table>`;
 
@@ -492,7 +505,7 @@ fetch(GOOGLE_SHEET_WEBAPP_URL, {
 })
 .then(() => {
   alert("ส่งคำแก้ไขแล้ว (กำลังอัปเดตข้อมูล)");
-  loadTodayData();
+  loadTodayData("today");
   loadLowStock();
 })
 .catch(err => {
