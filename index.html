@@ -423,7 +423,12 @@ function loadTodayData(){
       <td>${item.qty}</td>
       <td>${item.checker_name}</td>
       <td>
-        <button onclick="editTransaction('${item.id}','${item.name}',${item.qty})"
+<button onclick="editTransaction(
+  '${item.id}',
+  '${item.name}',
+  ${item.qty},
+  '${item.mode}'
+)"
 style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
 แก้ไข
 </button>
@@ -437,10 +442,40 @@ style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
       box.innerHTML = html;
     });
 }
-  function editTransaction(id,name,oldQty){
+
+function editTransaction(id,name,oldQty,oldMode){
+
+  let modeText = "";
+
+  if(oldMode === "in"){
+    modeText = "รับสินค้าเข้า";
+  }
+  else if(oldMode === "out"){
+    modeText = "ใช้สินค้า";
+  }
+  else{
+    modeText = "เช็คสต๊อก";
+  }
+
+  const newMode = prompt(
+    `โหมดเดิม: ${modeText}
+พิมพ์โหมดใหม่:
+in = รับเข้า
+out = ใช้ออก
+check = เช็คสต๊อก`,
+    oldMode
+  );
+
+  if(newMode === null) return;
+
+  if(!["in","out","check"].includes(newMode)){
+    alert("โหมดไม่ถูกต้อง");
+    return;
+  }
 
   const newQty = prompt(
-    `แก้จำนวน ${name}\nเดิม: ${oldQty}`,
+    `แก้จำนวน ${name}
+เดิม: ${oldQty}`,
     oldQty
   );
 
@@ -460,30 +495,38 @@ style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
     },
     body:JSON.stringify({
       checker_name: checkerName,
-      mode: "check",
+      mode: newMode,   // ใช้โหมดใหม่จริง
       category: "แก้ย้อนหลัง",
       fix_id: id,
-      items: [
+      items:[
         {
-          name: name,
-          qty: qty
+          name:name,
+          qty:qty
         }
       ]
     })
   })
   .then(res=>res.text())
   .then(res=>{
-    console.log(res)
-    alert("แก้ไขสำเร็จ")
 
-    loadTodayData()
-    loadLowStock()
+    console.log(res);
+
+    if(res.includes("error")){
+      alert("แก้ไขไม่สำเร็จ: " + res);
+      return;
+    }
+
+    alert("แก้ไขสำเร็จ");
+
+    loadTodayData();
+    loadLowStock();
   })
   .catch(err=>{
-    console.log(err)
-    alert("แก้ไขไม่สำเร็จ")
-  })
-}
+    console.log(err);
+    alert("แก้ไขไม่สำเร็จ");
+  });
+} 
+  
   function editItem(name, qty){
 
   document.getElementById("mode").value = "check";
