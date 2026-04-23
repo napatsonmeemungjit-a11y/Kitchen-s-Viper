@@ -496,19 +496,17 @@ check = เช็คสต๊อก`,
     })
   })
   .then(res=>res.text())
-  .then(res=>{
+.then(res=>{
+  console.log("server:", res);
 
-    console.log(res);
-
-    if(res.trim() === "success"){
-      alert("แก้ไขสำเร็จ");
-      loadTodayData();
-      loadLowStock();
-    }else{
-      alert(res);
-    }
-
-  })
+  if(res.includes("success")){
+    alert("แก้ไขสำเร็จ");
+    loadTodayData();
+    loadLowStock();
+  } else {
+    alert("แก้ไขไม่สำเร็จ: " + res);
+  }
+})
   .catch(err=>{
     console.log(err);
     alert("แก้ไขไม่สำเร็จ");
