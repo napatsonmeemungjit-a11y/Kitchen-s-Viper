@@ -390,6 +390,7 @@ function loadTodayData(){
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="background:#fde68a;">
+            <th>วันที่</th>
             <th>เวลา</th>
             <th>สินค้า</th>
             <th>ประเภท</th>
@@ -417,6 +418,7 @@ function loadTodayData(){
 
   html += `
     <tr>
+      <td>${item.date ? item.date : "-"}</td>
       <td>${item.time ? item.time : "-"}</td>
       <td>${item.name}</td>
       <td>${modeText}</td>
