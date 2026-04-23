@@ -444,7 +444,6 @@ function loadTodayData(type = "today"){
         <thead>
           <tr style="background:#fde68a;">
             <th>วันที่</th>
-            <th>เวลา</th>
             <th>สินค้า</th>
             <th>ประเภท</th>
             <th>จำนวน</th>
@@ -457,6 +456,16 @@ function loadTodayData(type = "today"){
 
       data.forEach(item => {
 
+        data.sort((a, b) => {
+
+  const [da, ma, ya] = a.date.split("/");
+  const [db, mb, yb] = b.date.split("/");
+
+  const dateA = new Date(`${ya}-${ma}-${da}`);
+  const dateB = new Date(`${yb}-${mb}-${db}`);
+
+  return dateB - dateA;
+});
         let modeText = "";
 
         if(item.mode === "in") modeText = "📥 รับเข้า";
@@ -466,7 +475,6 @@ function loadTodayData(type = "today"){
         html += `
           <tr>
             <td>${item.date}</td>
-            <td>${item.time}</td>
             <td>${item.name}</td>
             <td>${modeText}</td>
             <td>${item.qty}</td>
