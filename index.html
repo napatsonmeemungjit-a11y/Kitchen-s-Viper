@@ -477,33 +477,31 @@ check = เช็คสต๊อก`,
     return;
   }
 
-  // ✅ FIX สำคัญ: GAS ต้องใช้ no-cors
-  fetch(GOOGLE_SHEET_WEBAPP_URL, {
-    method: "POST",
-    mode: "no-cors",
-    body: JSON.stringify({
-      checker_name: checkerName,
-      mode: cleanMode,
-      category: "แก้ย้อนหลัง",
-      fix_id: id,
-      items: [
-        {
-          name: name,
-          qty: qty
-        }
-      ]
-    })
+fetch(GOOGLE_SHEET_WEBAPP_URL, {
+  method: "POST",
+  mode: "no-cors",
+  body: JSON.stringify({
+    checker_name: checkerName,
+    mode: cleanMode,
+    category: "แก้ย้อนหลัง",
+    fix_id: id,
+    items: [
+      {
+        name: name,
+        qty: qty
+      }
+    ]
   })
-  .then(() => {
-    // ❗ no-cors จะอ่าน response ไม่ได้ -> ถือว่าส่งสำเร็จ
-    alert("ส่งคำแก้ไขแล้ว (รอระบบอัปเดต)");
-    loadTodayData();
-    loadLowStock();
-  })
-  .catch(err => {
-    console.log(err);
-    alert("แก้ไขไม่สำเร็จ (network error)");
-  });
+})
+.then(() => {
+  alert("ส่งคำแก้ไขแล้ว (กำลังอัปเดตข้อมูล)");
+  loadTodayData();
+  loadLowStock();
+})
+.catch(err => {
+  console.log(err);
+  alert("แก้ไขไม่สำเร็จ (network error)");
+});
 
 }
   function editItem(name, qty){
