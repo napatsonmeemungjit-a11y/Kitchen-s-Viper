@@ -445,21 +445,9 @@ style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
 
 function editTransaction(id,name,oldQty,oldMode){
 
-  let modeText = "";
-
-  if(oldMode === "in"){
-    modeText = "รับสินค้าเข้า";
-  }
-  else if(oldMode === "out"){
-    modeText = "ใช้สินค้า";
-  }
-  else{
-    modeText = "เช็คสต๊อก";
-  }
-
   const newMode = prompt(
-    `โหมดเดิม: ${modeText}
-พิมพ์โหมดใหม่:
+    `แก้โหมดของ ${name}
+พิมพ์:
 in = รับเข้า
 out = ใช้ออก
 check = เช็คสต๊อก`,
@@ -474,8 +462,7 @@ check = เช็คสต๊อก`,
   }
 
   const newQty = prompt(
-    `แก้จำนวน ${name}
-เดิม: ${oldQty}`,
+    `แก้จำนวน ${name}\nเดิม: ${oldQty}`,
     oldQty
   );
 
@@ -495,13 +482,13 @@ check = เช็คสต๊อก`,
     },
     body:JSON.stringify({
       checker_name: checkerName,
-      mode: newMode,   // ใช้โหมดใหม่จริง
+      mode: newMode,   // ✅ ใช้โหมดใหม่จริงๆ
       category: "แก้ย้อนหลัง",
       fix_id: id,
-      items:[
+      items: [
         {
-          name:name,
-          qty:qty
+          name: name,
+          qty: qty
         }
       ]
     })
@@ -511,22 +498,20 @@ check = เช็คสต๊อก`,
 
     console.log(res);
 
-    if(res.includes("error")){
+    if(res.includes("success")){
+      alert("แก้ไขสำเร็จ");
+      loadTodayData();
+      loadLowStock();
+    }else{
       alert("แก้ไขไม่สำเร็จ: " + res);
-      return;
     }
 
-    alert("แก้ไขสำเร็จ");
-
-    loadTodayData();
-    loadLowStock();
   })
   .catch(err=>{
     console.log(err);
     alert("แก้ไขไม่สำเร็จ");
   });
-} 
-  
+}
   function editItem(name, qty){
 
   document.getElementById("mode").value = "check";
