@@ -417,7 +417,9 @@ function loadTodayData(type = "today"){
   const box = document.getElementById("todayList");
   const loading = document.getElementById("loadingBox");
 
-  // 🔥 highlight ปุ่ม
+  // 🔥 NEW: disable ปุ่มระหว่างโหลด
+  disableTabs(true);
+
   setActiveTab(type);
 
   // 🔥 loading
@@ -468,7 +470,16 @@ function loadTodayData(type = "today"){
             <td>${item.qty}</td>
             <td>${item.checker_name}</td>
             <td>
-              <button onclick="deleteTransaction('${item.id}')"
+             <button onclick="openEditPopup('${item.id}','${item.name}',${item.qty},'${item.mode}')"
+             style="background:#f59e0b;color:white;padding:5px;border-radius:5px;margin-right:5px;">
+             แก้
+             </button>
+
+             <button onclick="deleteTransaction('${item.id}')"
+             style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
+             ลบ
+             </button>
+            </td>
               style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
               ลบ
               </button>
@@ -479,11 +490,13 @@ function loadTodayData(type = "today"){
 
       html += `</tbody></table>`;
       box.innerHTML = html;
+      disableTabs(false);
     })
 
     .catch(err => {
       loading.style.display = "none";
       box.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
+      disableTabs(false);
     });
 }
 function editTransaction(id,name,oldQty,oldMode){
