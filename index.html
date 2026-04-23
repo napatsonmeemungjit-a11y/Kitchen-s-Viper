@@ -98,7 +98,11 @@ class="mt-2 w-full bg-blue-500 text-white p-3 rounded">
     ⬅ กลับ
   </button>
 
+  <div id="loadingBox" style="display:none;text-align:center;padding:10px;">
+  ⏳ กำลังโหลดข้อมูล...
+</div>
   <div id="todayList" class="bg-white p-3 rounded shadow"></div>
+  
 
 </div>
 
@@ -390,11 +394,18 @@ function backToMain(){
 
 function loadTodayData(type = "today"){
 
+  const box = document.getElementById("todayList");
+  const loading = document.getElementById("loadingBox");
+
+  // 🔥 แสดงโหลด
+  loading.style.display = "block";
+  box.innerHTML = "";
+
   fetch(GOOGLE_SHEET_WEBAPP_URL + "?type=" + type)
     .then(res => res.json())
     .then(data => {
 
-      const box = document.getElementById("todayList");
+      loading.style.display = "none";
 
       if(!data || data.length === 0){
         box.innerHTML = "ไม่มีข้อมูล";
@@ -450,6 +461,12 @@ function loadTodayData(type = "today"){
       html += `</tbody></table>`;
 
       box.innerHTML = html;
+    })
+
+    .catch(err => {
+      loading.style.display = "none";
+      box.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
+      console.log(err);
     });
 }
 
