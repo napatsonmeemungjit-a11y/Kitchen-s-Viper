@@ -477,12 +477,12 @@ check = เช็คสต๊อก`,
     return;
   }
 
-  fetch(GOOGLE_SHEET_WEBAPP_URL,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
+  fetch(GOOGLE_SHEET_WEBAPP_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     },
-    body:JSON.stringify({
+    body: JSON.stringify({
       checker_name: checkerName,
       mode: cleanMode,
       category: "แก้ย้อนหลัง",
@@ -495,22 +495,25 @@ check = เช็คสต๊อก`,
       ]
     })
   })
-  .then(res=>res.text())
-.then(res=>{
-  console.log("server:", res);
+  .then(res => res.text())
+  .then(res => {
 
-  if(res.includes("success")){
-    alert("แก้ไขสำเร็จ");
-    loadTodayData();
-    loadLowStock();
-  } else {
-    alert("แก้ไขไม่สำเร็จ: " + res);
-  }
-})
-  .catch(err=>{
+    console.log("server:", res);
+
+    if(res.includes("success")){
+      alert("แก้ไขสำเร็จ");
+      loadTodayData();
+      loadLowStock();
+    } else {
+      alert("แก้ไขไม่สำเร็จ: " + res);
+    }
+
+  })
+  .catch(err => {
     console.log(err);
-    alert("แก้ไขไม่สำเร็จ");
+    alert("แก้ไขไม่สำเร็จ (fetch error)");
   });
+
 }
   function editItem(name, qty){
 
