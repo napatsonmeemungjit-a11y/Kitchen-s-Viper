@@ -477,11 +477,10 @@ check = เช็คสต๊อก`,
     return;
   }
 
+  // ✅ FIX สำคัญ: GAS ต้องใช้ no-cors
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    mode: "no-cors",
     body: JSON.stringify({
       checker_name: checkerName,
       mode: cleanMode,
@@ -495,23 +494,15 @@ check = เช็คสต๊อก`,
       ]
     })
   })
-  .then(res => res.text())
-  .then(res => {
-
-    console.log("server:", res);
-
-    if(res.includes("success")){
-      alert("แก้ไขสำเร็จ");
-      loadTodayData();
-      loadLowStock();
-    } else {
-      alert("แก้ไขไม่สำเร็จ: " + res);
-    }
-
+  .then(() => {
+    // ❗ no-cors จะอ่าน response ไม่ได้ -> ถือว่าส่งสำเร็จ
+    alert("ส่งคำแก้ไขแล้ว (รอระบบอัปเดต)");
+    loadTodayData();
+    loadLowStock();
   })
   .catch(err => {
     console.log(err);
-    alert("แก้ไขไม่สำเร็จ (fetch error)");
+    alert("แก้ไขไม่สำเร็จ (network error)");
   });
 
 }
