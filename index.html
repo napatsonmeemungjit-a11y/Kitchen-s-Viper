@@ -422,7 +422,12 @@ function loadTodayData(){
       <td>${modeText}</td>
       <td>${item.qty}</td>
       <td>${item.checker_name}</td>
-      <td>-</td>
+      <td>
+<button onclick="deleteTransaction('${item.id}')"
+style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
+ลบ
+</button>
+</td>
     </tr>
   `;
 });
