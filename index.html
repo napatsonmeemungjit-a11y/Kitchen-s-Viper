@@ -500,7 +500,7 @@ check = เช็คสต๊อก`,
 
     console.log(res);
 
-    if(res.includes("success")){
+    if(res.trim() === "success"){
       alert("แก้ไขสำเร็จ");
       loadTodayData();
       loadLowStock();
