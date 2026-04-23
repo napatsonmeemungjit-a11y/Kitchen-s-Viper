@@ -430,8 +430,9 @@ function loadTodayData(type = "today"){
   fetch(GOOGLE_SHEET_WEBAPP_URL + "?type=" + type)
     .then(res => res.json())
     .then(data => {
-
+  
       loading.style.display = "none";
+      data.reverse();
       disableTabs(false);
 
       if(!data || data.length === 0){
