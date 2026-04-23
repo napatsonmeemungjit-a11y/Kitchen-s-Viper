@@ -446,8 +446,7 @@ style="background:#f59e0b;color:white;padding:5px;border-radius:5px;">
 function editTransaction(id,name,oldQty,oldMode){
 
   const newMode = prompt(
-    const cleanMode = newMode.trim().toLowerCase();
-    `แก้โหมดของ ${name}
+`แก้โหมดของ ${name}
 พิมพ์:
 in = รับเข้า
 out = ใช้ออก
@@ -457,7 +456,9 @@ check = เช็คสต๊อก`,
 
   if(newMode === null) return;
 
-  if(!["in","out","check"].includes(cleanMode))
+  const cleanMode = newMode.trim().toLowerCase();
+
+  if(!["in","out","check"].includes(cleanMode)){
     alert("โหมดไม่ถูกต้อง");
     return;
   }
@@ -483,7 +484,7 @@ check = เช็คสต๊อก`,
     },
     body:JSON.stringify({
       checker_name: checkerName,
-      mode: newMode,   // ✅ ใช้โหมดใหม่จริงๆ
+      mode: cleanMode,
       category: "แก้ย้อนหลัง",
       fix_id: id,
       items: [
@@ -497,17 +498,17 @@ check = เช็คสต๊อก`,
   .then(res=>res.text())
   .then(res=>{
 
-  console.log(res);
+    console.log(res);
 
-  if(res === "success"){
-    alert("แก้ไขสำเร็จ");
-    loadTodayData();
-    loadLowStock();
-  }else{
-    alert(res);
-  }
+    if(res.includes("success")){
+      alert("แก้ไขสำเร็จ");
+      loadTodayData();
+      loadLowStock();
+    }else{
+      alert(res);
+    }
 
-})
+  })
   .catch(err=>{
     console.log(err);
     alert("แก้ไขไม่สำเร็จ");
