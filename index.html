@@ -501,11 +501,6 @@ function loadTodayData(type = "today"){
             <td>${item.qty}</td>
             <td>${item.checker_name}</td>
             <td>
-              <button onclick="openEditPopup('${item.id}','${item.name}',${item.qty},'${item.mode}')"
-              style="background:#f59e0b;color:white;padding:5px;border-radius:5px;margin-right:5px;">
-              แก้
-              </button>
-
               <button onclick="deleteTransaction('${item.id}')"
               style="background:#ef4444;color:white;padding:5px;border-radius:5px;">
               ลบ
@@ -528,87 +523,7 @@ function loadTodayData(type = "today"){
       box.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
     });
 }
-function editTransaction(id,name,oldQty,oldMode){
 
-  const newMode = prompt(
-`แก้โหมดของ ${name}
-พิมพ์:
-in = รับเข้า
-out = ใช้ออก
-check = เช็คสต๊อก`,
-    oldMode
-  );
-
-  if(newMode === null) return;
-
-  const cleanMode = newMode.trim().toLowerCase();
-
-  if(!["in","out","check"].includes(cleanMode)){
-    alert("โหมดไม่ถูกต้อง");
-    return;
-  }
-
-  const newQty = prompt(
-    `แก้จำนวน ${name}\nเดิม: ${oldQty}`,
-    oldQty
-  );
-
-  if(newQty === null) return;
-
-  const qty = Number(newQty);
-
-  if(isNaN(qty)){
-    alert("กรุณากรอกตัวเลข");
-    return;
-  }
-
-fetch(GOOGLE_SHEET_WEBAPP_URL, {
-  method: "POST",
-  mode: "no-cors",
-  body: JSON.stringify({
-    checker_name: checkerName,
-    mode: cleanMode,
-    category: "แก้ย้อนหลัง",
-    fix_id: id,
-    items: [
-      {
-        name: name,
-        qty: qty
-      }
-    ]
-  })
-})
-.then(() => {
-  alert("ส่งคำแก้ไขแล้ว (กำลังอัปเดตข้อมูล)");
-  loadTodayData("today");
-  loadLowStock();
-})
-.catch(err => {
-  console.log(err);
-  alert("แก้ไขไม่สำเร็จ (network error)");
-});
-
-}
-  function editItem(name, qty){
-
-  document.getElementById("mode").value = "check";
-  updateUIByMode();
-
-  document.getElementById("searchInput").value = name;
-  renderItems();
-
-  setTimeout(()=>{
-    const inputs = document.querySelectorAll("#tbody input");
-
-    inputs.forEach(input=>{
-      const itemName = input.closest("tr").children[0].innerText;
-
-      if(itemName === name){
-        input.value = qty;
-      }
-    });
-  },300);
-}
 function deleteTransaction(id){
 
   console.log("ลบ id =", id);
