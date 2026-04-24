@@ -233,19 +233,20 @@ function renderItems(){
   }
 
   filtered.forEach((item,index)=>{
-    tbody.innerHTML += `
+  tbody.innerHTML += `
   <tr class="text-sm">
-    <td class="p-2 break-words">${item}</td>
-    <td style="width:80px;" class="p-2 text-center">
+    <td class="p-1 break-words">${item}</td>
+    
+    <td style="width:55px;" class="p-1 text-center">
       <input 
         type="number"
         step="0.5"
-        class="w-14 border p-1 text-center rounded"
+        class="w-10 border p-1 text-center rounded"
         min="0">
     </td>
   </tr>
 `;
-  });
+});
 }
 function loadLowStock(){
 
