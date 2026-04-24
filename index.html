@@ -137,6 +137,9 @@ style="flex:1;background:#10b981;color:white;padding:6px;border-radius:5px;">
   <div id="loadingBox" style="display:none;text-align:center;padding:10px;">
   ⏳ กำลังโหลดข้อมูล...
 </div>
+  <div id="deleteLoadingBox" style="display:none;text-align:center;padding:10px;color:red;font-weight:bold;">
+  🗑️ กำลังลบข้อมูล...
+</div>
   <div id="todayList" class="bg-white p-3 rounded shadow"></div>
   
 
@@ -529,13 +532,10 @@ function deleteTransaction(id){
   const ok = confirm("ต้องการลบรายการนี้ใช่ไหม?");
   if(!ok) return;
 
+  const deleteBox = document.getElementById("deleteLoadingBox");
+
   // แสดงสถานะกำลังลบ
-  const status = document.getElementById("statusText");
-  status.innerText = "🗑️ กำลังลบข้อมูล...";
-  
-  // ป้องกันกดลบซ้ำ
-  const buttons = document.querySelectorAll("button");
-  buttons.forEach(btn => btn.disabled = true);
+  deleteBox.style.display = "block";
 
   fetch(GOOGLE_SHEET_WEBAPP_URL, {
     method: "POST",
@@ -546,29 +546,20 @@ function deleteTransaction(id){
   .then(res => res.text())
   .then(res => {
 
-    status.innerText = "✅ ลบสำเร็จ";
+    // ซ่อนสถานะหลังลบเสร็จ
+    deleteBox.style.display = "none";
+
+    alert("ลบรายการแล้ว");
 
     loadTodayData();
     loadLowStock();
-
-    // เปิดปุ่มกลับ
-    buttons.forEach(btn => btn.disabled = false);
-
-    setTimeout(()=>{
-      status.innerText = "";
-    },2000);
   })
   .catch(err => {
 
+    deleteBox.style.display = "none";
+
+    alert("ลบไม่สำเร็จ");
     console.log(err);
-
-    status.innerText = "❌ ลบไม่สำเร็จ";
-
-    buttons.forEach(btn => btn.disabled = false);
-
-    setTimeout(()=>{
-      status.innerText = "";
-    },2000);
   });
 }
 function setActiveTab(type){
