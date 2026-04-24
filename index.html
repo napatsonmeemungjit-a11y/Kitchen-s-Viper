@@ -526,30 +526,49 @@ function loadTodayData(type = "today"){
 
 function deleteTransaction(id){
 
-  console.log("ลบ id =", id);
+  const ok = confirm("ต้องการลบรายการนี้ใช่ไหม?");
+  if(!ok) return;
 
-  const confirmDelete = confirm("ต้องการลบรายการนี้ใช่ไหม?");
-  if(!confirmDelete) return;
+  // แสดงสถานะกำลังลบ
+  const status = document.getElementById("statusText");
+  status.innerText = "🗑️ กำลังลบข้อมูล...";
+  
+  // ป้องกันกดลบซ้ำ
+  const buttons = document.querySelectorAll("button");
+  buttons.forEach(btn => btn.disabled = true);
 
-  fetch(GOOGLE_SHEET_WEBAPP_URL,{
-    method:"POST",
-    body:JSON.stringify({
-      delete_id:id
+  fetch(GOOGLE_SHEET_WEBAPP_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      delete_id: id
     })
   })
-  .then(res=>res.text())
-  .then(res=>{
+  .then(res => res.text())
+  .then(res => {
 
-    console.log(res);
-
-    alert("ลบรายการแล้ว");
+    status.innerText = "✅ ลบสำเร็จ";
 
     loadTodayData();
     loadLowStock();
+
+    // เปิดปุ่มกลับ
+    buttons.forEach(btn => btn.disabled = false);
+
+    setTimeout(()=>{
+      status.innerText = "";
+    },2000);
   })
-  .catch(err=>{
+  .catch(err => {
+
     console.log(err);
-    alert("ลบไม่สำเร็จ");
+
+    status.innerText = "❌ ลบไม่สำเร็จ";
+
+    buttons.forEach(btn => btn.disabled = false);
+
+    setTimeout(()=>{
+      status.innerText = "";
+    },2000);
   });
 }
 function setActiveTab(type){
