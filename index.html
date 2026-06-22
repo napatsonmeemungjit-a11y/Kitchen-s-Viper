@@ -287,6 +287,11 @@ function loadLowStock(){
 
     });
 }
+    .catch(err=>{
+      console.log("loadLowStock error", err);
+    });
+
+}
 function clearInputs(){
   const inputs = document.querySelectorAll("#tbody input");
   inputs.forEach(input=>{
