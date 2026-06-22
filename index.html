@@ -258,6 +258,8 @@ function renderItems(){
 }
 function loadLowStock(){
 
+function loadLowStock(){
+
   fetch(GOOGLE_SHEET_WEBAPP_URL)
     .then(res => res.json())
     .then(data => {
@@ -285,8 +287,7 @@ function loadLowStock(){
         hasShownPopup = true;
       }
 
-    });
-}
+    })
     .catch(err=>{
       console.log("loadLowStock error", err);
     });
