@@ -87,6 +87,7 @@ class="border p-2 mb-2 w-full" oninput="renderItems()">
 <thead>
 <tr class="bg-orange-200 text-sm">
 <th class="p-2 text-left">รายการ</th>
+<th class="p-1 text-center">คงเหลือ</th>
 <th style="width:45px;" class="p-1 text-center">จำนวน</th>
 </tr>
 </thead>
@@ -234,13 +235,17 @@ function renderItems(){
     return;
   }
 
-  filtered.forEach((item,index)=>{
+ filtered.forEach((item,index)=>{
   tbody.innerHTML += `
   <tr class="text-base">
     <td class="p-1 break-words w-auto">${item}</td>
-    
+
+    <td class="p-1 text-center">
+      -
+    </td>
+
     <td style="width:70px;" class="p-1 text-center">
-      <input 
+      <input
         type="number"
         step="0.5"
         class="w-12 border p-1 text-center rounded"
@@ -249,7 +254,6 @@ function renderItems(){
   </tr>
 `;
 });
-}
 function loadLowStock(){
 
   fetch(GOOGLE_SHEET_WEBAPP_URL)
